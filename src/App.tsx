@@ -45,6 +45,13 @@ export default function App() {
   };
 
   const startGame = (mode: GameMode) => {
+    // Unlock audio on mobile browsers
+    if ('speechSynthesis' in window) {
+      const utterance = new SpeechSynthesisUtterance('');
+      utterance.volume = 0;
+      window.speechSynthesis.speak(utterance);
+    }
+
     const activeWords = categories[selectedCategoryIndex].words;
     // ensure that if a category has very few words, we don't crash
     const pool = activeWords.length > 0 ? activeWords : vocabulary;
@@ -66,6 +73,13 @@ export default function App() {
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.lang = 'ja-JP';
       utterance.rate = 0.9;
+      
+      const voices = window.speechSynthesis.getVoices();
+      const jaVoice = voices.find(v => v.lang === 'ja-JP' || v.lang === 'ja_JP' || v.lang.includes('ja'));
+      if (jaVoice) {
+        utterance.voice = jaVoice;
+      }
+      
       window.speechSynthesis.speak(utterance);
     }
   };
